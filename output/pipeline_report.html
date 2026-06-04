@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Growth Pipeline Raporu — Konuşarak Öğren</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #050d1a;
+      --surface:   #0a1628;
+      --card:      #0f1f35;
+      --card2:     #122038;
+      --border:    #1e3252;
+      --accent:    #0ea5e9;
+      --accent2:   #06b6d4;
+      --green:     #10b981;
+      --amber:     #f59e0b;
+      --red:       #ef4444;
+      --text:      #e2eaf4;
+      --muted:     #637b99;
+      --glow:      0 0 40px #0ea5e920;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: .18;
+    }
+
+    /* ── GLOW ORBS ── */
+    body::after {
+      content: '';
+      position: fixed; top: -200px; left: -200px; z-index: 0;
+      width: 700px; height: 700px; border-radius: 50%; pointer-events: none;
+      background: radial-gradient(circle, #0ea5e918 0%, transparent 70%);
+      animation: orbFloat 12s ease-in-out infinite;
+    }
+    @keyframes orbFloat {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50%      { transform: translate(120px,80px) scale(1.15); }
+    }
+
+    /* ── LAYOUT ── */
+    .wrapper { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+      padding-bottom: 36px; border-bottom: 1px solid var(--border);
+      margin-bottom: 48px; animation: fadeDown .6s ease both;
+    }
+    .header-left { display: flex; flex-direction: column; gap: 10px; }
+    .logo-row { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; box-shadow: var(--glow);
+    }
+    .logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; color: var(--text); }
+    .logo-sub  { font-size: 13px; color: var(--muted); font-weight: 300; }
+    h1 {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.1; letter-spacing: -1px;
+      background: linear-gradient(135deg, #e2eaf4 0%, var(--accent) 60%, var(--accent2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .subtitle { color: var(--muted); font-size: 15px; font-weight: 300; }
+    .header-meta {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+      font-size: 13px; color: var(--muted);
+    }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #10b98115; border: 1px solid #10b98130;
+      color: var(--green); padding: 6px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: 500;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+    /* ── KPI GRID ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 36px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+      position: relative; overflow: hidden;
+      animation: fadeUp .5s ease both;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: var(--glow); }
+    .kpi-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--kpi-color, var(--accent));
+    }
+    .kpi-icon { font-size: 26px; margin-bottom: 12px; }
+    .kpi-value {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 36px; line-height: 1;
+      color: var(--kpi-color, var(--accent));
+    }
+    .kpi-label { color: var(--muted); font-size: 13px; margin-top: 6px; font-weight: 400; }
+    .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 8px; opacity: .7; }
+
+    /* ── 2-COL GRID ── */
+    .grid-2  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .grid-3  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media(max-width: 900px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px;
+      animation: fadeUp .5s ease both;
+    }
+    .card-title {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 16px; color: var(--text);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .card-title-icon { font-size: 18px; }
+
+    /* ── BAR CHART ── */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .bar-label { font-size: 13px; color: var(--muted); min-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 4px; width: 0; transition: width 1.2s cubic-bezier(.22,1,.36,1); }
+    .bar-count { font-size: 13px; color: var(--text); font-weight: 600; min-width: 24px; text-align: right; }
+
+    /* ── DONUT LEGEND ── */
+    .donut-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .donut-row:last-child { border-bottom: none; }
+    .donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .donut-key { flex: 1; font-size: 14px; color: var(--muted); }
+    .donut-pct { font-size: 14px; font-weight: 600; color: var(--text); }
+    .donut-pct em { font-style: normal; font-size: 12px; color: var(--muted); margin-left: 4px; }
+
+    /* ── PRIORITY CARDS ── */
+    .priority-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    @media(max-width: 700px) { .priority-grid { grid-template-columns: repeat(2,1fr); } }
+    .priority-card {
+      border: 1px solid; border-radius: 12px;
+      padding: 16px; text-align: center;
+      transition: transform .2s;
+    }
+    .priority-card:hover { transform: translateY(-2px); }
+    .priority-icon { font-size: 24px; margin-bottom: 6px; }
+    .priority-count { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 30px; line-height: 1; }
+    .priority-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--muted); margin-top: 4px; }
+
+    /* ── MESAJ TİPİ SPLIT ── */
+    .split-bar {
+      height: 12px; border-radius: 6px; overflow: hidden;
+      display: flex; margin: 16px 0;
+    }
+    .split-li { background: linear-gradient(90deg,var(--accent),var(--accent2)); transition: width 1.2s ease; }
+    .split-em { background: linear-gradient(90deg,#10b981,#06b6d4); transition: width 1.2s ease; }
+    .split-legend { display: flex; gap: 20px; margin-top: 8px; }
+    .split-legend span { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .split-legend span::before { content:''; display:inline-block; width:10px; height:10px; border-radius:2px; }
+    .split-legend .li-dot::before { background: var(--accent); }
+    .split-legend .em-dot::before { background: var(--green); }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th {
+      text-align: left; padding: 10px 14px;
+      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: .8px; color: var(--muted); text-transform: uppercase;
+    }
+    .lead-row { border-bottom: 1px solid var(--border); animation: fadeUp .4s ease both; }
+    .lead-row:last-child { border-bottom: none; }
+    .lead-row:hover { background: var(--card2); }
+    td { padding: 14px; vertical-align: middle; }
+    .rank { font-family:'Syne',sans-serif; font-weight:800; color:var(--muted); font-size:15px; }
+    .lead-name  { font-weight: 600; font-size: 14px; color: var(--text); }
+    .lead-title { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .company-tag {
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 10px; font-size: 12px;
+      color: var(--accent); font-weight: 500; white-space: nowrap;
+    }
+    .sector-tag {
+      background: #0ea5e910; border: 1px solid #0ea5e930;
+      border-radius: 6px; padding: 4px 10px; font-size: 12px;
+      color: var(--accent2); white-space: nowrap;
+    }
+    .score-cell { display: flex; flex-direction: column; gap: 4px; }
+    .score-num  { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; }
+    .score-mini-bar { width: 60px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .eng-score { font-size: 14px; color: var(--amber); letter-spacing: 1px; }
+
+    /* ── PIPELINE FLOW ── */
+    .flow-wrap  { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+    .flow-step  {
+      flex: 1; min-width: 120px;
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 16px; text-align: center;
+      position: relative; transition: transform .2s;
+    }
+    .flow-step:hover { transform: translateY(-2px); }
+    .flow-arrow {
+      color: var(--accent); font-size: 20px; padding: 0 6px;
+      flex-shrink: 0; opacity: .6;
+    }
+    .flow-num {
+      font-family:'Syne',sans-serif; font-weight:800;
+      font-size: 28px; color: var(--accent); line-height:1;
+    }
+    .flow-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); margin-top: 4px; }
+    .flow-sub  { font-size: 12px; color: var(--text); margin-top: 6px; font-weight:500; }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 60px; padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      font-size: 13px; color: var(--muted);
+      animation: fadeUp .5s ease both;
+    }
+    .footer strong { color: var(--accent); }
+    .footer-badge {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 14px; font-size: 12px;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:none} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(24px)}  to{opacity:1;transform:none} }
+    .kpi-card:nth-child(1) { animation-delay:.05s }
+    .kpi-card:nth-child(2) { animation-delay:.10s }
+    .kpi-card:nth-child(3) { animation-delay:.15s }
+    .kpi-card:nth-child(4) { animation-delay:.20s }
+    .kpi-card:nth-child(5) { animation-delay:.25s }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-row">
+        <div class="logo-icon">🎯</div>
+        <div>
+          <div class="logo-text">Konuşarak Öğren</div>
+          <div class="logo-sub">Growth Automation & AI Ops</div>
+        </div>
+      </div>
+      <h1>Growth Pipeline<br>Raporu</h1>
+      <p class="subtitle">HR Lead Toplama · Zenginleştirme · AI Outreach</p>
+    </div>
+    <div class="header-meta">
+      <div class="status-pill"><span class="status-dot"></span> Pipeline Tamamlandı</div>
+      <div>04 June 2026, 23:11</div>
+      <div>Model: claude-sonnet-4-20250514</div>
+    </div>
+  </header>
+
+  <!-- PIPELINE FLOW -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-title"><span class="card-title-icon">🔄</span> Pipeline Akışı</div>
+    <div class="flow-wrap">
+      <div class="flow-step">
+        <div class="flow-num">100</div>
+        <div class="flow-lbl">01 · Veri Toplama</div>
+        <div class="flow-sub">HR Lead Üretildi</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">100</div>
+        <div class="flow-lbl">02 · Zenginleştirme</div>
+        <div class="flow-sub">AI ile Analiz Edildi</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">200</div>
+        <div class="flow-lbl">03 · Outreach</div>
+        <div class="flow-sub">Mesaj Üretildi</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">100</div>
+        <div class="flow-lbl">04 · CRM</div>
+        <div class="flow-sub">Lead Takibe Alındı</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI GRID -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="--kpi-color:#0ea5e9">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-value">100</div>
+      <div class="kpi-label">Toplam HR Lead</div>
+      <div class="kpi-sub">Türkiye geneli mock veri</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#06b6d4">
+      <div class="kpi-icon">🔬</div>
+      <div class="kpi-value">100</div>
+      <div class="kpi-label">Zenginleştirilen Lead</div>
+      <div class="kpi-sub">%100.0 oran · AI analizi</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#10b981">
+      <div class="kpi-icon">✉️</div>
+      <div class="kpi-value">200</div>
+      <div class="kpi-label">Üretilen Mesaj</div>
+      <div class="kpi-sub">LinkedIn DM + Cold Email</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#f59e0b">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-value">71.5</div>
+      <div class="kpi-label">Ort. Lead Skoru</div>
+      <div class="kpi-sub">Max: 95 · Min: 65</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#8b5cf6">
+      <div class="kpi-icon">🗣️</div>
+      <div class="kpi-value">8.3</div>
+      <div class="kpi-label">Ort. İng. İhtiyacı</div>
+      <div class="kpi-sub">1–10 skalada AI skoru</div>
+    </div>
+  </div>
+
+  <!-- SEKTÖR + KIdem -->
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">🏢</span> Sektör Dağılımı</div>
+      
+        <div class="bar-row">
+          <div class="bar-label">Bankacılık / Özel Banka</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:100%;background:#0ea5e9" data-target="100"></div>
+          </div>
+          <div class="bar-count">7</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Perakende / Moda & Hazır Giyim</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:85%;background:#06b6d4" data-target="85"></div>
+          </div>
+          <div class="bar-count">6</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Danışmanlık / Strateji (MBB)</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:71%;background:#3b82f6" data-target="71"></div>
+          </div>
+          <div class="bar-count">5</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Lojistik / Yurt İçi Kargo</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:57%;background:#8b5cf6" data-target="57"></div>
+          </div>
+          <div class="bar-count">4</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Fintech / Ödeme Sistemleri</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:57%;background:#ec4899" data-target="57"></div>
+          </div>
+          <div class="bar-count">4</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Danışmanlık / Denetim & Danışmanlık (Big4)</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:42%;background:#f97316" data-target="42"></div>
+          </div>
+          <div class="bar-count">3</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">E-ticaret / Marketplace</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:42%;background:#10b981" data-target="42"></div>
+          </div>
+          <div class="bar-count">3</div>
+        </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">📊</span> Kıdem Dağılımı</div>
+      
+        <div class="donut-row">
+          <span class="donut-dot" style="background:#0ea5e9"></span>
+          <span class="donut-key">C-Level</span>
+          <span class="donut-pct">1 <em>%1.0</em></span>
+        </div>
+        <div class="donut-row">
+          <span class="donut-dot" style="background:#3b82f6"></span>
+          <span class="donut-key">Director</span>
+          <span class="donut-pct">22 <em>%22.0</em></span>
+        </div>
+        <div class="donut-row">
+          <span class="donut-dot" style="background:#06b6d4"></span>
+          <span class="donut-key">Senior</span>
+          <span class="donut-pct">33 <em>%33.0</em></span>
+        </div>
+        <div class="donut-row">
+          <span class="donut-dot" style="background:#67e8f9"></span>
+          <span class="donut-key">Mid</span>
+          <span class="donut-pct">35 <em>%35.0</em></span>
+        </div>
+        <div class="donut-row">
+          <span class="donut-dot" style="background:#bae6fd"></span>
+          <span class="donut-key">Junior</span>
+          <span class="donut-pct">9 <em>%9.0</em></span>
+        </div>
+    </div>
+  </div>
+
+  <!-- ÖNCELİK + ŞEHİR + KANAL -->
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">🎯</span> Lead Önceliği</div>
+      <div class="priority-grid">
+        <div class="priority-card" style="border-color:#ef444420;background:#ef444408">
+          <div class="priority-icon">🔴</div>
+          <div class="priority-count" style="color:#ef4444">22</div>
+          <div class="priority-label">URGENT</div>
+        </div>
+        <div class="priority-card" style="border-color:#f9731620;background:#f9731608">
+          <div class="priority-icon">🟠</div>
+          <div class="priority-count" style="color:#f97316">78</div>
+          <div class="priority-label">HIGH</div>
+        </div>
+        <div class="priority-card" style="border-color:#3b82f620;background:#3b82f608">
+          <div class="priority-icon">🟡</div>
+          <div class="priority-count" style="color:#3b82f6">0</div>
+          <div class="priority-label">MEDIUM</div>
+        </div>
+        <div class="priority-card" style="border-color:#6b728020;background:#6b728008">
+          <div class="priority-icon">🟢</div>
+          <div class="priority-count" style="color:#6b7280">0</div>
+          <div class="priority-label">LOW</div>
+        </div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">📍</span> Şehir Dağılımı</div>
+      
+        <div class="bar-row">
+          <div class="bar-label">İstanbul</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:100%;background:#06b6d4" data-target="100"></div>
+          </div>
+          <div class="bar-count">38</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Ankara</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:47%;background:#06b6d4" data-target="47"></div>
+          </div>
+          <div class="bar-count">18</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Kocaeli</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:28%;background:#06b6d4" data-target="28"></div>
+          </div>
+          <div class="bar-count">11</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Antalya</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:26%;background:#06b6d4" data-target="26"></div>
+          </div>
+          <div class="bar-count">10</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Gaziantep</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:21%;background:#06b6d4" data-target="21"></div>
+          </div>
+          <div class="bar-count">8</div>
+        </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">📨</span> Kanal Dağılımı</div>
+      <div style="display:flex;gap:28px;margin-bottom:16px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:32px;color:var(--accent)">100</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">LinkedIn DM</div>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:32px;color:var(--green)">100</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Cold Email</div>
+        </div>
+      </div>
+      <div class="split-bar">
+        <div class="split-li" style="width:50%"></div>
+        <div class="split-em" style="width:50%"></div>
+      </div>
+      <div class="split-legend">
+        <span class="li-dot">LinkedIn DM &nbsp;%50</span>
+        <span class="em-dot">Cold Email &nbsp;%50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP LEADS TABLE -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title"><span class="card-title-icon">⭐</span> En Yüksek Skorlu Leadler</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Kişi</th><th>Şirket</th><th>Sektör</th>
+            <th>Lead Skoru</th><th>İng. İhtiyaç</th><th>Öncelik</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr class="lead-row" style="animation-delay:0.08s">
+          <td><span class="rank">#1</span></td>
+          <td>
+            <div class="lead-name">Burak Erdoğan</div>
+            <div class="lead-title">Organizasyonel Gelişim Müdürü</div>
+          </td>
+          <td><span class="company-tag">EY Türkiye</span></td>
+          <td><span class="sector-tag">Danışmanlık / Denetim & Danışmanlık (Big4)</span></td>
+          <td>
+            <div class="score-cell">
+              <span class="score-num" style="color:#ef4444">95</span>
+              <div class="score-mini-bar">
+                <div style="width:95%;background:#ef4444;height:4px;border-radius:2px;transition:width 1s ease"></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="eng-score">★★★★★</span></td>
+          <td><span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px">URGENT</span></td>
+        </tr>
+        <tr class="lead-row" style="animation-delay:0.16s">
+          <td><span class="rank">#2</span></td>
+          <td>
+            <div class="lead-name">Neslihan Gündüz</div>
+            <div class="lead-title">People & Culture Manager</div>
+          </td>
+          <td><span class="company-tag">Hepsiburada</span></td>
+          <td><span class="sector-tag">E-ticaret / Marketplace</span></td>
+          <td>
+            <div class="score-cell">
+              <span class="score-num" style="color:#ef4444">94</span>
+              <div class="score-mini-bar">
+                <div style="width:94%;background:#ef4444;height:4px;border-radius:2px;transition:width 1s ease"></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="eng-score">★★★★★</span></td>
+          <td><span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px">URGENT</span></td>
+        </tr>
+        <tr class="lead-row" style="animation-delay:0.24s">
+          <td><span class="rank">#3</span></td>
+          <td>
+            <div class="lead-name">Ahmet Karakoç</div>
+            <div class="lead-title">İK Müdürü</div>
+          </td>
+          <td><span class="company-tag">Netlog</span></td>
+          <td><span class="sector-tag">Lojistik / Tedarik Zinciri</span></td>
+          <td>
+            <div class="score-cell">
+              <span class="score-num" style="color:#ef4444">94</span>
+              <div class="score-mini-bar">
+                <div style="width:94%;background:#ef4444;height:4px;border-radius:2px;transition:width 1s ease"></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="eng-score">★★★★★</span></td>
+          <td><span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px">URGENT</span></td>
+        </tr>
+        <tr class="lead-row" style="animation-delay:0.32s">
+          <td><span class="rank">#4</span></td>
+          <td>
+            <div class="lead-name">Ayşe Ceylan</div>
+            <div class="lead-title">İnsan Kaynakları Müdürü</div>
+          </td>
+          <td><span class="company-tag">PwC Türkiye</span></td>
+          <td><span class="sector-tag">Danışmanlık / Denetim & Vergi (Big4)</span></td>
+          <td>
+            <div class="score-cell">
+              <span class="score-num" style="color:#ef4444">93</span>
+              <div class="score-mini-bar">
+                <div style="width:93%;background:#ef4444;height:4px;border-radius:2px;transition:width 1s ease"></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="eng-score">★★★★★</span></td>
+          <td><span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px">URGENT</span></td>
+        </tr>
+        <tr class="lead-row" style="animation-delay:0.4s">
+          <td><span class="rank">#5</span></td>
+          <td>
+            <div class="lead-name">Onur Boz</div>
+            <div class="lead-title">Learning & Development Director</div>
+          </td>
+          <td><span class="company-tag">Craftgate</span></td>
+          <td><span class="sector-tag">Fintech / Ödeme Altyapısı</span></td>
+          <td>
+            <div class="score-cell">
+              <span class="score-num" style="color:#ef4444">91</span>
+              <div class="score-mini-bar">
+                <div style="width:91%;background:#ef4444;height:4px;border-radius:2px;transition:width 1s ease"></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="eng-score">★★★★★</span></td>
+          <td><span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px">URGENT</span></td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>
+      Üretildi: <strong>04 June 2026, 23:11</strong> &nbsp;·&nbsp;
+      Model: <strong>claude-sonnet-4-20250514</strong> &nbsp;·&nbsp;
+      Konuşarak Öğren Growth Automation Pipeline
+    </div>
+    <div class="footer-badge">🚀 Growth Automation & AI Ops Challenge</div>
+  </footer>
+
+</div>
+
+<script>
+  // Sayı animasyonları
+  document.querySelectorAll('.kpi-value').forEach(el => {
+    const target = parseFloat(el.textContent);
+    if (isNaN(target)) return;
+    let start = 0;
+    const isFloat = el.textContent.includes('.');
+    const step = target / 40;
+    const timer = setInterval(() => {
+      start = Math.min(start + step, target);
+      el.textContent = isFloat ? start.toFixed(1) : Math.floor(start);
+      if (start >= target) clearInterval(timer);
+    }, 30);
+  });
+
+  // Bar animasyonları — IntersectionObserver ile tetikle
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.bar-fill').forEach(bar => {
+          bar.style.width = bar.dataset.target + '%';
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.card').forEach(c => observer.observe(c));
+</script>
+</body>
+</html>
