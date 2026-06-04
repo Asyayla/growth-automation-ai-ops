@@ -7,7 +7,6 @@ professionals across Turkey. Developed as a 48-hour technical challenge for the
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Claude API](https://img.shields.io/badge/Claude-Sonnet_4-D97706?style=flat-square)](https://anthropic.com)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org)
-[![License](https://img.shields.io/badge/License-MIT-10B981?style=flat-square)](LICENSE)
 
 ---
 
